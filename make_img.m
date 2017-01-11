@@ -4,7 +4,8 @@ m = mseq(R);
 m = vertcat(m,zeros(1000,1));
 
 %%
-F = 70;
+F =70;
+FG_FS = 57;
 divide = 10;
 fs = 52428;
 per_tip = 1;
@@ -29,24 +30,27 @@ for i = 1:fs
     last_fix = fix(t*F/per_tip)+1;
 end
 
-time_div = dlmread('WAVE/AAAE0025.CSV',',',[3 1 3 1])*10;
+time_div = dlmread('WAVE/AAAF0025.CSV',',',[3 1 3 1])*10;
 c_fs =  10001/time_div;
 
 
 for i=1:4
-    wave_mic{i} = dlmread(sprintf('WAVE/AAAE00%d.CSV',5+i*5),',',[30 1 10030 3]);
+    wave_mic{i} = dlmread(sprintf('WAVE/AAAF00%d.CSV',5+i*5),',',[30 1 10030 3]);
 end
 
 
 for i=1:4
-    wave_r{i} = [osci_to_xcorr(wave_mic{i}(:,1),wave_S,time_div,divide,F),osci_to_xcorr(wave_mic{i}(:,2),wave_S,time_div,divide,F)];
-    wave_r{i} = wave_r{i}(5000:end,:);
+    wave_r{i} = [osci_to_xcorr(wave_mic{i}(:,1),wave_S,time_div,divide,FG_FS),osci_to_xcorr(wave_mic{i}(:,2),wave_S,time_div,divide,FG_FS)];
+    wave_r{i} = wave_r{i}(6300:end,:);
 end
 
 
 %%
+
+TATE = 1200;
+
 W = 0.6;
-H = W*(480/640);
+H = W*(TATE/640);
 d = W/640;
 y_ax = 0:d:H-d;
 x_ax = 0:d:W-d;
@@ -56,12 +60,12 @@ v = 340;
 s = [0.10,0.15,0.20,0.25,0.30];
 speaker = [-0.05,W/2];
 
-B_data = zeros(480,640);
-C_data = zeros(480,640,2);
+B_data = zeros(TATE,640);
+C_data = zeros(TATE,640,2);
 
 
 for i=1:640
-    for j=1:480
+    for j=1:TATE
         ten = [j,i]*d;
         spk_tar = norm(speaker - ten);
         for k=1:4
